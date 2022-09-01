@@ -12,7 +12,7 @@ def get_requirements_list()->List[str]:
 
 setup(
 name="shipping-price-predictor",
-version="0.0.3",
+version="0.0.5",
 author="Tanmay",
 description="This is cover type predictor setup file",
 packages=["supply_chain"],
