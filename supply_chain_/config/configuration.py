@@ -1,4 +1,4 @@
-from supply_chain_.entity.config_entity import DataIngestionConfig,TrainingPipelineConfig
+from supply_chain_.entity.config_entity import DataIngestionConfig,DataValidationConfig,TrainingPipelineConfig
 from supply_chain_.logger import logging
 from supply_chain_.exception import supply_chain_exception
 from supply_chain_.constant import *
@@ -31,6 +31,43 @@ class Configuration:
 
         except Exception as e:
             raise supply_chain_exception(e,sys) from e
+
+
+    def get_data_validation_config(self) -> DataValidationConfig:
+        try:
+            data_validation_info=self.config_info[DATA_VALIDATION_CONFIG_KEY]
+            
+            artifact_dir = self.training_pipeline_config.artifact_dir
+            data_validation_artifact_dir=os.path.join(
+                artifact_dir,
+                DATA_VALIDATION_ARTIFACT_DIR_NAME,
+                self.timestamp
+            )
+            
+
+            schema_file_path = os.path.join(ROOT_DIR,
+            data_validation_info[DATA_VALIDATION_SCHEMA_DIR_KEY],
+            data_validation_info[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY]
+            )
+
+            report_file_path = os.path.join(data_validation_artifact_dir,
+            data_validation_info[DATA_VALIDATION_REPORT_FILE_NAME_KEY]
+            )
+
+            report_page_file_path = os.path.join(data_validation_artifact_dir,
+            data_validation_info[DATA_VALIDATION_REPORT_PAGE_FILE_NAME_KEY]
+
+            )
+
+            data_validation_config = DataValidationConfig(
+                schema_file_path=schema_file_path,
+                report_file_path=report_file_path,
+                report_page_file_path=report_page_file_path,
+            )
+            return data_validation_config
+        except Exception as e:
+            raise supply_chain_exception(e,sys) from e
+
 
 
     def get_training_pipeline_config(self) -> TrainingPipelineConfig:
