@@ -1,4 +1,4 @@
-from supply_chain_.entity.config_entity import DataIngestionConfig,DataValidationConfig,TrainingPipelineConfig
+from supply_chain_.entity.config_entity import DataIngestionConfig,DataValidationConfig,DataTransformationConfig,TrainingPipelineConfig
 from supply_chain_.logger import logging
 from supply_chain_.exception import supply_chain_exception
 from supply_chain_.constant import *
@@ -20,12 +20,11 @@ class Configuration:
             data_ingestion_artifact_dir=os.path.join(artifact_dir,DATA_INGESTION_ARTIFACT_DIR,self.timestamp)
             raw_data_dir=os.path.join(data_ingestion_artifact_dir,data_ingestion_info[DATA_INGESTION_RAW_DATA_DIR_KEY])
             ingested_dir=os.path.join(data_ingestion_artifact_dir,data_ingestion_info[DATA_INGESTION_INGESTED_DIR_NAME_KEY])
-            ingested_train_dir=os.path.join(ingested_dir,data_ingestion_info[DATA_INGESTION_TRAIN_DIR_KEY])
-            ingested_test_dir=os.path.join(ingested_dir,data_ingestion_info[DATA_INGESTION_TEST_DIR_KEY])
+ 
+          
             data_ingestion_config=DataIngestionConfig(
             raw_data_dir=raw_data_dir, 
-            ingested_train_dir=ingested_train_dir, 
-            ingested_test_dir=ingested_test_dir)
+)
             logging.info(f"Data Ingestion config: {data_ingestion_config}")
             return data_ingestion_config
 
@@ -38,35 +37,76 @@ class Configuration:
             data_validation_info=self.config_info[DATA_VALIDATION_CONFIG_KEY]
             
             artifact_dir = self.training_pipeline_config.artifact_dir
-            data_validation_artifact_dir=os.path.join(
+     
+
+            data_validation_data_dir=os.path.join(
                 artifact_dir,
                 DATA_VALIDATION_ARTIFACT_DIR_NAME,
-                self.timestamp
+                self.timestamp,DATA_VALIDATION_RAW_DIR_NAME
             )
             
 
-            schema_file_path = os.path.join(ROOT_DIR,
-            data_validation_info[DATA_VALIDATION_SCHEMA_DIR_KEY],
-            data_validation_info[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY]
-            )
-
-            report_file_path = os.path.join(data_validation_artifact_dir,
-            data_validation_info[DATA_VALIDATION_REPORT_FILE_NAME_KEY]
-            )
-
-            report_page_file_path = os.path.join(data_validation_artifact_dir,
-            data_validation_info[DATA_VALIDATION_REPORT_PAGE_FILE_NAME_KEY]
-
-            )
-
             data_validation_config = DataValidationConfig(
-                schema_file_path=schema_file_path,
-                report_file_path=report_file_path,
-                report_page_file_path=report_page_file_path,
+                raw_data_path=data_validation_data_dir
             )
             return data_validation_config
         except Exception as e:
             raise supply_chain_exception(e,sys) from e
+
+
+    def get_data_transformation_config(self) -> DataTransformationConfig:
+        try:
+            data_transformation_config_info=self.config_info[DATA_TRANSFORMATION_CONFIG_KEY]
+
+            artifact_dir = self.training_pipeline_config.artifact_dir
+
+            data_transformation_artifact_dir=os.path.join(
+                artifact_dir,
+                DATA_TRANSFORMATION_ARTIFACT_DIR,
+                self.timestamp
+            )
+
+
+
+            preprocessed_object_file_path = os.path.join(
+                data_transformation_artifact_dir,
+                data_transformation_config_info[DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY],
+                data_transformation_config_info[DATA_TRANSFORMATION_PREPROCESSED_FILE_NAME_KEY]
+            )
+
+            preprocessed_object_folder_path=os.path.join(
+                data_transformation_artifact_dir,
+                data_transformation_config_info[DATA_TRANSFORMATION_PREPROCESSING_DIR_KEY])
+
+            
+            transformed_train_dir=os.path.join(
+            data_transformation_artifact_dir,
+            data_transformation_config_info[DATA_TRANSFORMATION_DIR_NAME_KEY],
+            data_transformation_config_info[DATA_TRANSFORMATION_TRAIN_DIR_NAME_KEY]
+            )
+
+
+            transformed_test_dir = os.path.join(
+            data_transformation_artifact_dir,
+            data_transformation_config_info[DATA_TRANSFORMATION_DIR_NAME_KEY],
+            data_transformation_config_info[DATA_TRANSFORMATION_TEST_DIR_NAME_KEY]
+
+            )
+            
+
+            data_transformation_config=DataTransformationConfig(
+                preprocessed_object_file_path=preprocessed_object_file_path,
+                transformed_train_dir=transformed_train_dir,
+                transformed_test_dir=transformed_test_dir,
+                preprocessed_object_folder_path=preprocessed_object_folder_path
+            )
+
+            logging.info(f"Data transformation config: {data_transformation_config}")
+            return data_transformation_config
+        except Exception as e:
+            raise supply_chain_exception(e,sys) from e
+
+
 
 
 

@@ -36,38 +36,10 @@ class DataIngestion:
         except Exception as e:
             raise supply_chain_exception(e,sys) from e
 
-
-    def split_data_as_train_test(self) -> DataIngestionArtifact:
-        try:
-            raw_data_dir = self.data_ingestion_config.raw_data_dir
-            os.makedirs(self.data_ingestion_config.ingested_train_dir,exist_ok=True)
-            os.makedirs(self.data_ingestion_config.ingested_test_dir,exist_ok=True)
-            file_name=os.listdir(os.path.join(PATH_READ_LATEST_INGESTION_DATA,os.listdir(PATH_READ_LATEST_INGESTION_DATA)[(len(os.listdir(PATH_READ_LATEST_INGESTION_DATA)))-1],"raw_data"))[0]
-
-            supply_chain_file_path = os.path.join(raw_data_dir,file_name)
-
-
-            logging.info(f"Reading csv file: [{supply_chain_file_path}]")
-            supply_chain_data_frame = pd.read_csv(supply_chain_file_path)
-
-            df_train,df_test = train_test_split(supply_chain_data_frame,test_size=0.2, random_state=0)
-
-            logging.info(f"Splitting data into train and test")
-
-            train_file_path=os.path.join(self.data_ingestion_config.ingested_train_dir,"train_data.csv")
-            df_train.to_csv(train_file_path,index=False)
-            test_file_path=os.path.join(self.data_ingestion_config.ingested_test_dir,"test_data.csv")
-            df_test.to_csv(test_file_path,index=False)
-
-            data_ingestion_artifact=DataIngestionArtifact(train_file_path=train_file_path,test_file_path=test_file_path,is_ingested=True,message="Data Ingested")
-            return data_ingestion_artifact
-        except Exception as e:
-            raise supply_chain_exception(e,sys) from e
-
     def initiate_data_ingestion(self)-> DataIngestionArtifact:
         try:
             self.get_data_from_database()
-            return self.split_data_as_train_test()
+            return DataIngestionArtifact(raw_data_file_path=os.path.join(self.data_ingestion_config.raw_data_dir,"dumped_data.csv"),is_ingested=True,message="Data Ingestion done")
         except Exception as e:
             raise supply_chain_exception(e,sys) from e
         
