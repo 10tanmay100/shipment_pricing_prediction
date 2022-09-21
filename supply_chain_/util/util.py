@@ -19,3 +19,13 @@ def read_yaml_file(file_path:str)->dict:
 
 def pandas_factory(colnames, rows):
     return pd.DataFrame(rows, columns=colnames)
+
+
+def outlier_detector(dataframe,column_name):
+
+    q1=dataframe[column_name].quantile(0.25)
+    q3=dataframe[column_name].quantile(0.75)
+    IQR=q3-q1
+    lower_bound=q1-1.5*IQR
+    upper_bound=q3+1.5*IQR
+    return dataframe[(dataframe[column_name]>=lower_bound)&(dataframe[column_name]<=upper_bound)]

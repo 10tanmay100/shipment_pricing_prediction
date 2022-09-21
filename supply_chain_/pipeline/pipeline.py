@@ -3,7 +3,7 @@ from supply_chain_.entity.config_entity import DataIngestionConfig,TrainingPipel
 from supply_chain_.logger import logging
 from supply_chain_.component.data_ingestion import DataIngestion
 from supply_chain_.component.data_validation import DataValidation
-# from supply_chain_.component.data_transformation import DataTransformation
+from supply_chain_.component.data_transformation import DataTransformation
 # from supply_chain_.component.model_trainer import ModelTrainer
 from supply_chain_.entity.artifact_entity import *
 from supply_chain_.exception import supply_chain_exception
@@ -32,25 +32,27 @@ class Pipeline:
             raise supply_chain_exception(e, sys) from e
 
 
-    # def start_data_transformation(self,
-    #                               data_ingestion_artifact: DataIngestionArtifact,
-    #                               data_validation_artifact: DataValidationArtifact
-    #                               ) -> DataTransformationArtifact:
-    #     try:
-    #         data_transformation = DataTransformation(
-    #             data_transformation_config=self.config.get_data_transformation_config(),
-    #             data_ingestion_artifact=data_ingestion_artifact,
-    #             data_validation_artifact=data_validation_artifact
-    #         )
-    #         return data_transformation.initiate_data_transformation()
-    #     except Exception as e:
-    #         raise forest_cover_exception(e, sys)
+    def start_data_transformation(self,
+                                  data_ingestion_artifact: DataIngestionArtifact,
+                                  data_validation_artifact: DataValidationArtifact
+                                  ) -> DataTransformationArtifact:
+        try:
+            data_transformation = DataTransformation(
+                data_transformation_config=self.config.get_data_transformation_config(),
+                data_ingestion_artifact=data_ingestion_artifact,
+                data_validation_artifact=data_validation_artifact
+            )
+            return data_transformation.initiate_data_transformation()
+        except Exception as e:
+            raise supply_chain_exception(e, sys)
 
 
     def run_pipeline(self):
         try:
             data_ingestion_artifact=self.start_data_ingestion()
             data_validation_artifact=self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
+            data_transformation_artifact = self.start_data_transformation(data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact
+            )
             return "done"
         except Exception as e:
             raise supply_chain_exception(e,sys) from e 
