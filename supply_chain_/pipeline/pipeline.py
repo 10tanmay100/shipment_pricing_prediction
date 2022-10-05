@@ -4,6 +4,7 @@ from supply_chain_.logger import logging
 from supply_chain_.component.data_ingestion import DataIngestion
 from supply_chain_.component.data_validation import DataValidation
 from supply_chain_.component.data_transformation import DataTransformation
+from supply_chain_.component.model_trainer import ModelTrainer
 # from supply_chain_.component.model_trainer import ModelTrainer
 from supply_chain_.entity.artifact_entity import *
 from supply_chain_.exception import supply_chain_exception
@@ -45,6 +46,12 @@ class Pipeline:
             return data_transformation.initiate_data_transformation()
         except Exception as e:
             raise supply_chain_exception(e, sys)
+    def start_model_training(self,data_transformation_artifact:DataTransformationArtifact):
+        try:
+            model_trainer=ModelTrainer(model_trainer_config=self.config.get_model_trainer_config(),data_transformation_artifact=data_transformation_artifact)
+            return model_trainer.initiate_model_training()
+        except Exception as e:
+            raise supply_chain_exception(e,sys) from e
 
 
     def run_pipeline(self):
@@ -53,6 +60,7 @@ class Pipeline:
             data_validation_artifact=self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
             data_transformation_artifact = self.start_data_transformation(data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact
             )
+            model_trainer_artifact=self.start_model_training(data_transformation_artifact=data_transformation_artifact)
             return "done"
         except Exception as e:
             raise supply_chain_exception(e,sys) from e 

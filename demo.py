@@ -2,9 +2,7 @@
 from supply_chain_.config.configuration import Configuration
 from supply_chain_.pipeline.pipeline import Pipeline
 def run():
-    p=Configuration
-    # print(p.get_data_transformation_config())
-    pipe=Pipeline(p)
-    return pipe.run_pipeline()
+    p=Pipeline(Configuration)
+    print(p.run_pipeline())
 
 run()

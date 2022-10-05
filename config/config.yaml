@@ -18,3 +18,10 @@ data_transformation_config:
   transformed_test_dir: test
   preprocessing_dir: preprocessed
   preprocessed_object_file_name: preprocessed.pkl
+
+model_trainer_config:
+  trained_model_dir: trained_model
+  model_file_name_cluster0: model_cluster0.pkl
+  model_file_name_cluster1: model_cluster1.pkl
+  base_accuracy: 0.8
+  model_config_dir: config
